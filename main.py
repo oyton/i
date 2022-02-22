@@ -251,8 +251,8 @@ class Window(QMainWindow):
         bottom_layout.addLayout(buttons_layout, 1)
 
         bbottom_layout = QHBoxLayout()
-        self.buttonCaptureCsi0 = QPushButton("Save From CSI 0")
-        self.buttonCaptureCsi1 = QPushButton("Save From CSI 1")
+        self.buttonCaptureCsi0 = QPushButton("Save From Left I")
+        self.buttonCaptureCsi1 = QPushButton("Save From Right I")
         self.buttonCaptureCsi0.setSizePolicy(QSizePolicy.Preferred,
                                             QSizePolicy.Expanding)
         self.buttonCaptureCsi1.setSizePolicy(QSizePolicy.Preferred,
@@ -320,12 +320,12 @@ class Window(QMainWindow):
 
     @Slot(QImage)
     def setImage0(self, image):
-        self.rightImg = self.th0.rgbImg
+        self.rightImg = self.cap_csi0.rgbImage
         self.label1.setPixmap(QPixmap.fromImage(image))
     
     @Slot(QImage)
     def setImage1(self, image):
-        self.leftImg = self.th1.rgbImg
+        self.leftImg = self.cap_csi1.rgbImg
         self.label0.setPixmap(QPixmap.fromImage(image))
 
 
