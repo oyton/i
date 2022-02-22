@@ -105,9 +105,11 @@ class CsiCaptureDev(QObject):
                 scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
                 # Emit signal
                 if self.dev_id == 0:
-                    self.image0Ready.emit(scaled_img)
+                    pass
+                    #self.image0Ready.emit(scaled_img)
                 else:
-                    self.image1Ready.emit(scaled_img)
+                    pass
+                    #self.image1Ready.emit(scaled_img)
 
             else:
                 print("Error: csi"+str(self.dev_id)+" is unable to retrieve frame")
