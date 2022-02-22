@@ -93,6 +93,7 @@ class CsiCaptureDev(QObject):
                                                         display_width=self.dev_output_width,
                                                         display_height=self.dev_output_height,
                                                         framerate=self.dev_input_fps)
+            print(self.gstr_pipe)
             loggy(self.gstr_pipe)
             self.cv_vid_capture = cv2.VideoCapture(self.gstr_pipe, cv2.CAP_GSTREAMER)
             loggy("run started to execute; device_id=%d vid cap created" % self.dev_id)
