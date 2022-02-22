@@ -84,7 +84,7 @@ class CsiCaptureDev(QObject):
         loggy("run started to execute; device_id=%d" % self.dev_id)
         if self.dev_acces_type == "gstr":
             loggy("run started to execute; device_id=%d gstr" % self.dev_id)
-            loggy(gstreamer_pipeline(sensor_id=self.dev_id, 
+            loggy(self.gstreamer_pipeline(sensor_id=self.dev_id, 
                                                         flip_method=self.dev_input_flip_mode,
                                                         capture_width=self.dev_input_width,
                                                         capture_height=self.dev_input_height,
