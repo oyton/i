@@ -84,6 +84,13 @@ class CsiCaptureDev(QObject):
         loggy("run started to execute; device_id=%d" % self.dev_id)
         if self.dev_acces_type == "gstr":
             loggy("run started to execute; device_id=%d gstr" % self.dev_id)
+            loggy(gstreamer_pipeline(sensor_id=self.dev_id, 
+                                                        flip_method=self.dev_input_flip_mode,
+                                                        capture_width=self.dev_input_width,
+                                                        capture_height=self.dev_input_height,
+                                                        display_width=self.dev_output_width,
+                                                        display_height=self.dev_output_height,
+                                                        framerate=self.dev_input_fps))
             self.cv_vid_capture = cv2.VideoCapture(gstreamer_pipeline(sensor_id=self.dev_id, 
                                                         flip_method=self.dev_input_flip_mode,
                                                         capture_width=self.dev_input_width,
@@ -208,7 +215,7 @@ class Window(QMainWindow):
         ##self.th1.finished.connect(self.close)
         ##self.th1.updateFrame.connect(self.setImage1)
         self.thread_of_csi1 = QThread()
-        self.cap_csi1 = CsiCaptureDev(1,"gstr", "3264x2464", 0, 21, "820x616", "RGB")
+        self.cap_csi1 = CsiCaptureDev(1,"gstr", "3264x2464", 0, 21, "820x616", "RGB") # QObject
         self.cap_csi1.moveToThread(self.thread_of_csi1)
         self.thread_of_csi1.started.connect(self.cap_csi1.run)
         self.cap_csi1.finished.connect(self.thread_of_csi1.quit)
