@@ -44,11 +44,12 @@ def gstreamer_pipeline(
     )
 
 class CsiCaptureDev(QObject):
-    finished = Signal()
-    imageReady = Signal(QImage)
+    
     def __init__(self, device_no=0, dev_access="gstr", inputResolution="3264x2464", 
                         inputFlip=0, inputFps=21, outputResolution="820x616", outputType="RGB"):
         super().__init__()
+        self.finished = Signal()
+        self.imageReady = Signal(QImage)
         self.dev_id = device_no
         self.dev_acces_type = dev_access
         self.dev_input_width = inputResolution.split("x")[0]
@@ -84,7 +85,7 @@ class CsiCaptureDev(QObject):
         loggy("run started to execute; device_id=%d" % self.dev_id)
         if self.dev_acces_type == "gstr":
             loggy("run started to execute; device_id=%d gstr" % self.dev_id)
-            self.gstr_pipe = gstreamer_pipeline(sensor_id=self.dev_id, 
+            self.gstr_pipe = self.gstreamer_pipeline(sensor_id=self.dev_id, 
                                                         flip_method=self.dev_input_flip_mode,
                                                         capture_width=self.dev_input_width,
                                                         capture_height=self.dev_input_height,
