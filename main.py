@@ -53,12 +53,12 @@ class CsiCaptureDev(QObject):
         super().__init__()
         self.dev_id = device_no
         self.dev_acces_type = dev_access
-        self.dev_input_width = inputResolution.split("x")[0]
-        self.dev_input_height = inputResolution.split("x")[1]
+        self.dev_input_width = int(inputResolution.split("x")[0])
+        self.dev_input_height = int(inputResolution.split("x")[1])
         self.dev_input_fps = inputFps
         self.dev_input_flip_mode = inputFlip
-        self.dev_output_width = outputResolution.split("x")[0]
-        self.dev_output_height = outputResolution.split("x")[1]
+        self.dev_output_width = int(outputResolution.split("x")[0])
+        self.dev_output_height = int(outputResolution.split("x")[1])
         self.output_color_coding = outputType
         self.continue_to_run = True 
     
