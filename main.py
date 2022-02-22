@@ -105,7 +105,7 @@ class CsiCaptureDev(QObject):
                 # Creating and scaling QImage
                 h, w, ch = frameOfnp.shape
                 rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
-                self.rgbImage = rgbFrame
+                self.rgbImage = rgbFrame.copy()
                 smallRgbFrame = cv2.resize(rgbFrame, (820, 616))
                 img = QImage(smallRgbFrame, w, h, ch * w, QImage.Format_RGB888)    
                 scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
@@ -325,7 +325,7 @@ class Window(QMainWindow):
     
     @Slot(QImage)
     def setImage1(self, image):
-        self.leftImg = self.cap_csi1.rgbImg
+        self.leftImg = self.cap_csi1.rgbImage
         self.label0.setPixmap(QPixmap.fromImage(image))
 
 
