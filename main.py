@@ -97,7 +97,7 @@ class CsiCaptureDev(QObject):
             if retval:
                 # Creating and scaling QImage
                 h, w, ch = frameOfnp.shape
-                loggy("width: %d, height: %d, #channels: %d" %(w,h,ch))
+                print(frameOfnp.dtype)
                 rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
                 self.rgbImage = rgbFrame.copy()
                 smallRgbFrame = cv2.resize(rgbFrame, (self.dev_output_width, self.dev_output_height))
