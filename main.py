@@ -10,6 +10,12 @@ import cv2, sys, time
 import numpy as np
 from PIL import Image
 
+import logging
+logging.basicConfig(level=logging.INFO)
+loggy = logging.info
+
+
+
 def gstreamer_pipeline(
     sensor_id=0,
     capture_width=1920,
@@ -75,7 +81,9 @@ class CsiCaptureDev(QObject):
         )
 
     def run(self):
+        loggy("run started to execute; device_id=%d" % self.dev_id)
         if self.dev_acces_type == "gstr":
+            loggy("run started to execute; device_id=%d gstr" % self.dev_id)
             self.cv_vid_capture = cv2.VideoCapture(gstreamer_pipeline(sensor_id=self.dev_id, 
                                                         flip_method=self.dev_input_flip_mode,
                                                         capture_width=self.dev_input_width,
@@ -83,9 +91,12 @@ class CsiCaptureDev(QObject):
                                                         display_width=self.dev_output_width,
                                                         display_height=self.dev_output_height,
                                                         framerate=self.dev_input_fps), cv2.CAP_GSTREAMER)
+            loggy("run started to execute; device_id=%d vid cap created" % self.dev_id)
         while self.continue_to_run:
             retval, frameOfnp = self.cv_vid_capture.read()
+            loggy("run started to execute; device_id=%d inside while" % self.dev_id)
             if retval:
+                loggy("run started to execute; device_id=%d inside retval" % self.dev_id)
                 # Creating and scaling QImage
                 h, w, ch = frameOfnp.shape
                 rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
@@ -96,6 +107,7 @@ class CsiCaptureDev(QObject):
                 # Emit signal
                 self.imageReady.emit(scaled_img)
             else:
+                loggy("run started to execute; device_id=%d inside not retval" % self.dev_id)
                 print("Error: csi"+str(self.dev_id)+" is unable to retrieve frame")
                 self.cv_vid_capture.release()
                 time.sleep(3)
