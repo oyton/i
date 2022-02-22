@@ -88,8 +88,8 @@ class CsiCaptureDev(QObject):
                                                         flip_method=self.dev_input_flip_mode,
                                                         capture_width=self.dev_input_width,
                                                         capture_height=self.dev_input_height,
-                                                        display_width=self.dev_output_width,
-                                                        display_height=self.dev_output_height,
+                                                        display_width=self.dev_input_width,
+                                                        display_height=self.dev_input_height,
                                                         framerate=self.dev_input_fps)
             self.cv_vid_capture = cv2.VideoCapture(self.gstr_pipe, cv2.CAP_GSTREAMER)
         while self.continue_to_run:
@@ -97,10 +97,10 @@ class CsiCaptureDev(QObject):
             if retval:
                 # Creating and scaling QImage
                 h, w, ch = frameOfnp.shape
-                loggy("width: %d, height: %d, #channels: %d" %(h,w,ch))
+                loggy("width: %d, height: %d, #channels: %d" %(w,h,ch))
                 rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
                 self.rgbImage = rgbFrame.copy()
-                smallRgbFrame = cv2.resize(rgbFrame, (820, 616))
+                smallRgbFrame = cv2.resize(rgbFrame, (self.dev_output_width, self.dev_output_height))
                 img = QImage(smallRgbFrame, w, h, ch * w, QImage.Format_RGB888)    
                 scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
                 # Emit signal
