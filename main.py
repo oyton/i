@@ -44,12 +44,13 @@ def gstreamer_pipeline(
     )
 
 class CsiCaptureDev(QObject):
-    
+    finished0 = Signal()
+    finished1 = Signal()
+    image0Ready = Signal(QImage)
+    image1Ready = Signal(QImage)
     def __init__(self, device_no=0, dev_access="gstr", inputResolution="3264x2464", 
                         inputFlip=0, inputFps=21, outputResolution="820x616", outputType="RGB"):
         super().__init__()
-        self.finished = Signal()
-        self.imageReady = Signal(QImage)
         self.dev_id = device_no
         self.dev_acces_type = dev_access
         self.dev_input_width = inputResolution.split("x")[0]
@@ -108,18 +109,29 @@ class CsiCaptureDev(QObject):
                 img = QImage(smallRgbFrame, w, h, ch * w, QImage.Format_RGB888)    
                 scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
                 # Emit signal
-                self.imageReady.emit(scaled_img)
+                if self.dev_id == 0:
+                    self.image0Ready.emit(scaled_img)
+                else:
+                    self.image1Ready.emit(scaled_img)
+
             else:
                 loggy("run started to execute; device_id=%d inside not retval" % self.dev_id)
                 print("Error: csi"+str(self.dev_id)+" is unable to retrieve frame")
                 self.cv_vid_capture.release()
                 time.sleep(3)
-                self.finished.emit()
+                if self.dev_id == 0:
+                    self.finished0.emit()
+                else:
+                    self.finished1.emit()
+
         
         print("csi"+str(self.dev_id)+" is stopped")   
         self.cv_vid_capture.release()
         time.sleep(3)
-        self.finished.emit()
+        if self.dev_id == 0:
+            self.finished0.emit()
+        else:
+            self.finished1.emit()
         
 
 
