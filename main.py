@@ -213,10 +213,10 @@ class Window(QMainWindow):
         self.cap_csi0 = CsiCaptureDev(0,"gstr", "3264x2464", 0, 21, "820x616", "RGB")
         self.cap_csi0.moveToThread(self.thread_of_csi0)
         self.thread_of_csi0.started.connect(self.cap_csi0.run)
-        self.cap_csi0.finished.connect(self.thread_of_csi0.quit)
-        self.cap_csi0.finished.connect(self.cap_csi0.deleteLater)
+        self.cap_csi0.finished0.connect(self.thread_of_csi0.quit)
+        self.cap_csi0.finished0.connect(self.cap_csi0.deleteLater)
         self.thread_of_csi0.finished.connect(self.thread_of_csi0.deleteLater)
-        self.cap_csi0.imageReady.connect(self.setImage0)
+        self.cap_csi0.image0Ready.connect(self.setImage0)
         
         # Thread in charge of updating the image
         ##self.th1 = ThreadCapture(self, 1)
@@ -226,10 +226,10 @@ class Window(QMainWindow):
         self.cap_csi1 = CsiCaptureDev(1,"gstr", "3264x2464", 0, 21, "820x616", "RGB") # QObject
         self.cap_csi1.moveToThread(self.thread_of_csi1)
         self.thread_of_csi1.started.connect(self.cap_csi1.run)
-        self.cap_csi1.finished.connect(self.thread_of_csi1.quit)
-        self.cap_csi1.finished.connect(self.cap_csi1.deleteLater)
+        self.cap_csi1.finished1.connect(self.thread_of_csi1.quit)
+        self.cap_csi1.finished1.connect(self.cap_csi1.deleteLater)
         self.thread_of_csi1.finished.connect(self.thread_of_csi1.deleteLater)
-        self.cap_csi1.imageReady.connect(self.setImage1)
+        self.cap_csi1.image1Ready.connect(self.setImage1)
         
         # Buttons layout
         buttons_layout = QHBoxLayout()
