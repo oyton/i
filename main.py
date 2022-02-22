@@ -83,9 +83,7 @@ class CsiCaptureDev(QObject):
         )
 
     def run(self):
-        loggy("run started to execute; device_id=%d" % self.dev_id)
         if self.dev_acces_type == "gstr":
-            loggy("run started to execute; device_id=%d gstr" % self.dev_id)
             self.gstr_pipe = self.gstreamer_pipeline(sensor_id=self.dev_id, 
                                                         flip_method=self.dev_input_flip_mode,
                                                         capture_width=self.dev_input_width,
@@ -93,15 +91,10 @@ class CsiCaptureDev(QObject):
                                                         display_width=self.dev_output_width,
                                                         display_height=self.dev_output_height,
                                                         framerate=self.dev_input_fps)
-            print(self.gstr_pipe)
-            loggy(self.gstr_pipe)
             self.cv_vid_capture = cv2.VideoCapture(self.gstr_pipe, cv2.CAP_GSTREAMER)
-            loggy("run started to execute; device_id=%d vid cap created" % self.dev_id)
         while self.continue_to_run:
             retval, frameOfnp = self.cv_vid_capture.read()
-            loggy("run started to execute; device_id=%d inside while" % self.dev_id)
             if retval:
-                loggy("run started to execute; device_id=%d inside retval" % self.dev_id)
                 # Creating and scaling QImage
                 h, w, ch = frameOfnp.shape
                 rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
@@ -116,7 +109,6 @@ class CsiCaptureDev(QObject):
                     self.image1Ready.emit(scaled_img)
 
             else:
-                loggy("run started to execute; device_id=%d inside not retval" % self.dev_id)
                 print("Error: csi"+str(self.dev_id)+" is unable to retrieve frame")
                 self.cv_vid_capture.release()
                 time.sleep(3)
@@ -282,13 +274,13 @@ class Window(QMainWindow):
     def saveFig0(self):
         print("saving from left I")
         postList = str(time.time()).split(".")
-        filename = "1_"+postList[0]+postList[1]+".png"
+        filename = "left_"+postList[0]+postList[1]+".png"
         Image.fromarray(self.leftImg).save(filename)
 
     def saveFig1(self):
         print("saving from right I")
         postList = str(time.time()).split(".")
-        filename = "0_"+postList[0]+postList[1]+".png"
+        filename = "right_"+postList[0]+postList[1]+".png"
         Image.fromarray(self.rightImg).save(filename)
 
     @Slot()
