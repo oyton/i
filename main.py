@@ -84,20 +84,15 @@ class CsiCaptureDev(QObject):
         loggy("run started to execute; device_id=%d" % self.dev_id)
         if self.dev_acces_type == "gstr":
             loggy("run started to execute; device_id=%d gstr" % self.dev_id)
-            loggy(self.gstreamer_pipeline(sensor_id=self.dev_id, 
+            self.gstr_pipe = gstreamer_pipeline(sensor_id=self.dev_id, 
                                                         flip_method=self.dev_input_flip_mode,
                                                         capture_width=self.dev_input_width,
                                                         capture_height=self.dev_input_height,
                                                         display_width=self.dev_output_width,
                                                         display_height=self.dev_output_height,
                                                         framerate=self.dev_input_fps))
-            self.cv_vid_capture = cv2.VideoCapture(gstreamer_pipeline(sensor_id=self.dev_id, 
-                                                        flip_method=self.dev_input_flip_mode,
-                                                        capture_width=self.dev_input_width,
-                                                        capture_height=self.dev_input_height,
-                                                        display_width=self.dev_output_width,
-                                                        display_height=self.dev_output_height,
-                                                        framerate=self.dev_input_fps), cv2.CAP_GSTREAMER)
+            loggy(self.gstr_pipe)
+            self.cv_vid_capture = cv2.VideoCapture(self.gstr_pipe, cv2.CAP_GSTREAMER)
             loggy("run started to execute; device_id=%d vid cap created" % self.dev_id)
         while self.continue_to_run:
             retval, frameOfnp = self.cv_vid_capture.read()
