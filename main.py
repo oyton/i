@@ -42,6 +42,7 @@ class CsiCaptureDev(QObject):
     imageReady = Signal(QImage)
     def __init__(self, device_no=0, dev_access="gstr", inputResolution="3264x2464", 
                         inputFlip=0, inputFps=21, outputResolution="820x616", outputType="RGB"):
+        super().__init__()
         self.dev_id = device_no
         self.dev_acces_type = dev_access
         self.dev_input_width = inputResolution.split("x")[0]
