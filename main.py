@@ -41,8 +41,8 @@ class ThreadCapture(QThread):
     
     updateFrame = Signal(QImage)
 
-    def __init__(self, sensor_id, parent=None):
-        super(QThread.__init__(self, parent))
+    def __init__(self, sensor_id=0, parent=None):
+        super(QThread.__init__(self))
         self.sensor_id = sensor_id
         self.status = True
         self.cap = cv2.VideoCapture(gstreamer_pipeline(sensor_id=self.sensor_id, 
