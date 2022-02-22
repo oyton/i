@@ -106,10 +106,10 @@ class CsiCaptureDev(QObject):
                 # Emit signal
                 if self.dev_id == 0:
                     pass
-                    #self.image0Ready.emit(scaled_img)
+                    self.image0Ready.emit(scaled_img)
                 else:
                     pass
-                    #self.image1Ready.emit(scaled_img)
+                    self.image1Ready.emit(scaled_img)
 
             else:
                 print("Error: csi"+str(self.dev_id)+" is unable to retrieve frame")
@@ -206,7 +206,7 @@ class Window(QMainWindow):
         ##self.th0.finished.connect(self.close)
         ##self.th0.updateFrame.connect(self.setImage0)
         self.thread_of_csi0 = QThread()
-        self.cap_csi0 = CsiCaptureDev(0,"gstr", "3264x2464", 0, 21, "820x616", "RGB")
+        self.cap_csi0 = CsiCaptureDev(0,"gstr", "1640x1232", 0, 21, "820x616", "RGB")
         self.cap_csi0.moveToThread(self.thread_of_csi0)
         self.thread_of_csi0.started.connect(self.cap_csi0.run)
         self.cap_csi0.finished0.connect(self.thread_of_csi0.quit)
@@ -219,7 +219,7 @@ class Window(QMainWindow):
         ##self.th1.finished.connect(self.close)
         ##self.th1.updateFrame.connect(self.setImage1)
         self.thread_of_csi1 = QThread()
-        self.cap_csi1 = CsiCaptureDev(1,"gstr", "3264x2464", 0, 21, "820x616", "RGB") # QObject
+        self.cap_csi1 = CsiCaptureDev(1,"gstr", "1640x1232", 0, 21, "820x616", "RGB") # QObject
         self.cap_csi1.moveToThread(self.thread_of_csi1)
         self.thread_of_csi1.started.connect(self.cap_csi1.run)
         self.cap_csi1.finished1.connect(self.thread_of_csi1.quit)
