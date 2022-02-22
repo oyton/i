@@ -1,5 +1,5 @@
 from PySide2 import QtCore
-from PySide2.QtCore import Qt, QThread, Signal, Slot
+from PySide2.QtCore import Qt, QThread, Signal, Slot, QObject
 from PySide2.QtGui import QImage, QKeySequence, QPixmap
 from PySide2.QtWidgets import (QMainWindow, QAction, QApplication,
                                 QHBoxLayout, QLabel, QGroupBox, 
@@ -36,6 +36,78 @@ def gstreamer_pipeline(
             display_height,
         )
     )
+
+class CsiCaptureDev(QObject):
+    finished = Signal()
+    imageReady = Signal(QImage)
+    def __init__(self, device_no=0, dev_access="gstr", inputResolution="3264x2464", 
+                        inputFlip=0, inputFps=21, outputResolution="820x616", outputType="RGB"):
+        self.dev_id = device_no
+        self.dev_acces_type = dev_access
+        self.dev_input_width = inputResolution.split("x")[0]
+        self.dev_input_height = inputResolution.split("x")[1]
+        self.dev_input_fps = inputFps
+        self.dev_input_flip_mode = inputFlip
+        self.dev_output_width = outputResolution.split("x")[0]
+        self.dev_output_height = outputResolution.split("x")[1]
+        self.output_color_coding = outputType
+        self.continue_to_run = True 
+    
+    def gstreamer_pipeline(self, sensor_id=0, capture_width=1920, capture_height=1080, display_width=960,
+                            display_height=540, framerate=30, flip_method=0):
+        return (
+        "nvarguscamerasrc sensor-id=%d !"
+        "video/x-raw(memory:NVMM), width=(int)%d, height=(int)%d, framerate=(fraction)%d/1 ! "
+        "nvvidconv flip-method=%d ! "
+        "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
+        "videoconvert ! "
+        "video/x-raw, format=(string)BGR ! appsink"
+        % (
+            sensor_id,
+            capture_width,
+            capture_height,
+            framerate,
+            flip_method,
+            display_width,
+            display_height,
+        )
+        )
+
+    def run(self):
+        if self.dev_acces_type == "gstr":
+            self.cv_vid_capture = cv2.VideoCapture(gstreamer_pipeline(sensor_id=self.dev_id, 
+                                                        flip_method=self.dev_input_flip_mode,
+                                                        capture_width=self.dev_input_width,
+                                                        capture_height=self.dev_input_height,
+                                                        display_width=self.dev_output_width,
+                                                        display_height=self.dev_output_height,
+                                                        framerate=self.dev_input_fps), cv2.CAP_GSTREAMER)
+        while self.continue_to_run:
+            retval, frameOfnp = self.cv_vid_capture.read()
+            if retval:
+                # Creating and scaling QImage
+                h, w, ch = frameOfnp.shape
+                rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
+                self.rgbImage = rgbFrame
+                smallRgbFrame = cv2.resize(rgbFrame, (820, 616))
+                img = QImage(smallRgbFrame, w, h, ch * w, QImage.Format_RGB888)    
+                scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
+                # Emit signal
+                self.imageReady.emit(scaled_img)
+            else:
+                print("Error: csi"+str(self.dev_id)+" is unable to retrieve frame")
+                self.cv_vid_capture.release()
+                time.sleep(3)
+                self.finished.emit()
+        
+        print("csi"+str(self.dev_id)+" is stopped")   
+        self.cv_vid_capture.release()
+        time.sleep(3)
+        self.finished.emit()
+        
+
+
+
 
 class ThreadCapture(QThread):
     
@@ -83,7 +155,7 @@ class Window(QMainWindow):
         super().__init__()
         # Title and dimensions
         self.setWindowTitle("VEOS I")
-        self.setGeometry(0, 0, 800, 500)
+        self.setGeometry(0, 0, 1280, 720)
 
         # Main menu bar
         self.menu = self.menuBar()
@@ -106,14 +178,30 @@ class Window(QMainWindow):
         labels_layout.addWidget(self.label1)
         
         # Thread in charge of updating the image
-        self.th0 = ThreadCapture(self, 0)
-        self.th0.finished.connect(self.close)
-        self.th0.updateFrame.connect(self.setImage0)
+        ##self.th0 = ThreadCapture(self, 0)
+        ##self.th0.finished.connect(self.close)
+        ##self.th0.updateFrame.connect(self.setImage0)
+        self.thread_of_csi0 = QThread()
+        self.cap_csi0 = CsiCaptureDev(0,"gstr", "3264x2464", 0, 21, "820x616", "RGB")
+        self.cap_csi0.moveToThread(self.thread_of_csi0)
+        self.thread_of_csi0.started.connect(self.cap_csi0.run)
+        self.cap_csi0.finished.connect(self.thread_of_csi0.quit)
+        self.cap_csi0.finished.connect(self.cap_csi0.deleteLater)
+        self.thread_of_csi0.finished.connect(self.thread_of_csi0.deleteLater)
+        self.cap_csi0.imageReady.connect(self.setImage0)
         
         # Thread in charge of updating the image
-        self.th1 = ThreadCapture(self, 1)
-        self.th1.finished.connect(self.close)
-        self.th1.updateFrame.connect(self.setImage1)
+        ##self.th1 = ThreadCapture(self, 1)
+        ##self.th1.finished.connect(self.close)
+        ##self.th1.updateFrame.connect(self.setImage1)
+        self.thread_of_csi1 = QThread()
+        self.cap_csi1 = CsiCaptureDev(1,"gstr", "3264x2464", 0, 21, "820x616", "RGB")
+        self.cap_csi1.moveToThread(self.thread_of_csi1)
+        self.thread_of_csi1.started.connect(self.cap_csi1.run)
+        self.cap_csi1.finished.connect(self.thread_of_csi1.quit)
+        self.cap_csi1.finished.connect(self.cap_csi1.deleteLater)
+        self.thread_of_csi1.finished.connect(self.thread_of_csi1.deleteLater)
+        self.cap_csi1.imageReady.connect(self.setImage1)
         
         # Buttons layout
         buttons_layout = QHBoxLayout()
@@ -172,30 +260,34 @@ class Window(QMainWindow):
         print("saving from right I")
         postList = str(time.time()).split(".")
         filename = "0_"+postList[0]+postList[1]+".png"
-        Image.fromarray(self.leftImg).save(filename)
+        Image.fromarray(self.rightImg).save(filename)
 
     @Slot()
     def kill_thread(self):
         print("Finishing...")
-        self.th0.status = False
-        self.th1.status = False
+        #self.th0.status = False
+        #self.th1.status = False
         #self.th.cap0.Close()
         #self.th.cap1.Close()
-        time.sleep(4)       
-        self.th0.terminate()
-        self.th1.terminate()
+        self.cap_csi0.continue_to_run = False
+        self.cap_csi1.continue_to_run = False
+        #time.sleep(4)       
+        #self.th0.terminate()
+        #self.th1.terminate()
         # Give time for the thread to finish
         time.sleep(4) 
 
     @Slot()
     def start0(self):
         print("Starting...0")
-        self.th0.start()
+        #self.th0.start()
+        self.thread_of_csi0.start()
 
     @Slot()
     def start1(self):
         print("Starting...1")
-        self.th1.start()
+        #self.th1.start()
+        self.thread_of_csi1.start()
 
     @Slot(QImage)
     def setImage0(self, image):
