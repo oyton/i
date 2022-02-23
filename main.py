@@ -6,6 +6,9 @@ from PySide2.QtWidgets import (QMainWindow, QAction, QApplication,
                                 QPushButton, QSizePolicy,
                                 QWidget, QVBoxLayout)
 
+import qimage2ndarray
+
+
 import cv2, sys, time
 import numpy as np
 from PIL import Image
@@ -96,20 +99,11 @@ class CsiCaptureDev(QObject):
             retval, frameOfnp = self.cv_vid_capture.read()
             if retval:
                 # Creating and scaling QImage
-                h, w, ch = frameOfnp.shape
-                print(frameOfnp.dtype)
+                h, w, ch = frameOfnp.shape #dtype uint8
                 rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
                 self.rgbImage = rgbFrame.copy()
                 smallRgbFrame = cv2.resize(rgbFrame, (self.dev_output_width, self.dev_output_height))
-                print("aa")
-                str_smallRgbFrame = smallRgbFrame.tostring()
-                print("bb")
-                data = QByteArray(str_smallRgbFrame)
-                print("cc")
-                img = QImage.loadFromData(data)
-                print("dd")    
-                print(img.isNull())
-                print("ee")
+                img = qimage2ndarray.array2qimage(data)
                 scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
 
                 # Emit signal
