@@ -106,9 +106,12 @@ class CsiCaptureDev(QObject):
                 print("bb")
                 data = QByteArray(str_smallRgbFrame)
                 print("cc")
-                img = QImage(data, w, h, QImage.Format_RGB888)    
+                img = QImage(data, w, h, QImage.Format_RGB888)
+                print("dd")    
                 print(img.isNull())
+                print("ee")
                 scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
+                
                 # Emit signal
                 if self.dev_id == 0:
                     pass
