@@ -106,7 +106,7 @@ class CsiCaptureDev(QObject):
                 print("bb")
                 data = QByteArray(str_smallRgbFrame)
                 print("cc")
-                img = QImage.loadFromData(data, w, h, QImage.Format_RGB888)
+                img = QImage.loadFromData(data)
                 print("dd")    
                 print(img.isNull())
                 print("ee")
