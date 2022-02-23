@@ -103,7 +103,7 @@ class CsiCaptureDev(QObject):
                 rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
                 self.rgbImage = rgbFrame.copy()
                 smallRgbFrame = cv2.resize(rgbFrame, (self.dev_output_width, self.dev_output_height))
-                img = qimage2ndarray.array2qimage(data)
+                img = qimage2ndarray.array2qimage(smallRgbFrame)
                 scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
 
                 # Emit signal
