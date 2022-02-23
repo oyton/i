@@ -15,4 +15,6 @@ for i in range(100):
     ASTR = A.tostring()
     h, w, ch = A.shape
     QA = QImage(ASTR, w, h, QImage.Format_RGB888)
+    ASTR = b""
+    del ASTR
 
