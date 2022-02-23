@@ -1,5 +1,5 @@
 from PySide2 import QtCore
-from PySide2.QtCore import Qt, QThread, Signal, Slot, QObject
+from PySide2.QtCore import Qt, QThread, Signal, Slot, QObject, QByteArray
 from PySide2.QtGui import QImage, QKeySequence, QPixmap
 from PySide2.QtWidgets import (QMainWindow, QAction, QApplication,
                                 QHBoxLayout, QLabel, QGroupBox, 
@@ -101,7 +101,9 @@ class CsiCaptureDev(QObject):
                 rgbFrame = cv2.cvtColor(frameOfnp, cv2.COLOR_BGR2RGB)
                 self.rgbImage = rgbFrame.copy()
                 smallRgbFrame = cv2.resize(rgbFrame, (self.dev_output_width, self.dev_output_height))
-                img = QImage(smallRgbFrame, w, h, ch * w, QImage.Format_RGB888)    
+                str_smallRgbFrame = smallRgbFrame.tostring()
+                data = QByteArray(str_smallRgbFrame)
+                img = QImage(data, w, h, QImage.Format_RGB888)    
                 scaled_img = img.scaled(640, 480, Qt.KeepAspectRatio)
                 # Emit signal
                 if self.dev_id == 0:
@@ -110,7 +112,8 @@ class CsiCaptureDev(QObject):
                 else:
                     pass
                     self.image1Ready.emit(scaled_img)
-                img = QImage()
+                data.clear()
+                del data
 
             else:
                 print("Error: csi"+str(self.dev_id)+" is unable to retrieve frame")
