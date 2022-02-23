@@ -9,8 +9,10 @@ def createImage():
     A = aaa.astype(np.uint8)
     return A
 
+
 for i in range(100):
+    A = createImage()
     ASTR = A.tostring()
     h, w, ch = A.shape
     QA = QImage(ASTR, w, h, QImage.Format_RGB888)
-    
+
